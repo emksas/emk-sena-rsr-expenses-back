@@ -3,11 +3,6 @@ const db = require('../config/db');
 async function getExpenses() {
     return new Promise((resolve, reject) => {
         db.query('SELECT * FROM egreso', (error, results) => {
-            
-            console.log('Results:', results);
-
-            console.log('Error:', error);
-            
             if (error) {
                 return reject(error);
             }
@@ -17,9 +12,10 @@ async function getExpenses() {
 }
 
 async function addExpense(expense) {
+    console.log(expense);
     return new Promise((resolve, reject) => {
-        const query = 'INSERT INTO expenses (description, amount, date) VALUES (?, ?, ?)';  
-        db.query(query, [expense.description, expense.amount, expense.date], (error, results) => {
+        const query = 'INSERT INTO egreso ( valor, descripcion, estado, idPlanificacion, cuentaContable_id) VALUES (?, ?, ?, ?, ?)';  
+        db.query(query, [expense.amount, expense.description, expense.state, expense.idPlanification, expense.accountId], (error, results) => {
             if (error) {
                 return reject(error);
             }
@@ -31,4 +27,5 @@ async function addExpense(expense) {
 
 module.exports = {
     getExpenses,
+    addExpense
 };
