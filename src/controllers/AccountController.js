@@ -1,7 +1,22 @@
 const accountService = require('../services/AccountService');
 
 async function getAccounts(req, res) {
+    
+    const numbers = [
+        1, 
+        2, 3, 4]; 
+    const numbersTwo = new Array(4); 
+    const numbersThree = null; 
+
+    numbersThree.push(1)
+    
+    
+    
     try {
+
+
+
+
         const accounts = await accountService.getAccounts();
         res.status(200).json(accounts);
     } catch (error) {
