@@ -1,19 +1,17 @@
-const axios = require('axios');
-const { getAppToken } = require('../config/auth');
-const targetUser = 'rammses.93_outlook.com#EXT#@rammses93outlook.onmicrosoft.com';
+const axios = require("axios");
+const { getAppToken } = require("../config/auth");
+const targetUser = encodeURIComponent(
+  "rammses.93_outlook.com#EXT#@rammses93outlook.onmicrosoft.com"
+);
+
+const { getDelegatedToken } = require("../config/auth");
 
 async function getFolderByName() {
-    const token = await getAppToken();
-    const url = `https://graph.microsoft.com/v1.0/users/${targetUser}/mailFolders`;
-    const { data } = await axios.get(url, { headers: { Authorization: `Bearer ${token}` } });
-    return data.value; 
+  const token = await getDelegatedToken();
+  const me = await axios.get("https://graph.microsoft.com/v1.0/me", {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  console.log("Me:", me.data.userPrincipalName);
 }
 
-async function getEmailsFromFolder(folderId) {
-    const token = await getAppToken();
-    const url = `https://graph.microsoft.com/v1.0/users/${tarsetUser}/mailFolders/${folderId}/messages`;
-    const { data } = await axios.get(url, { headers: { Authorization: `Bearer ${token}` } });
-    return data.value; 
-}
-
-module.exports = { getFolderByName, getEmailsFromFolder };
+module.exports = { getFolderByName };
