@@ -1,4 +1,3 @@
-const msal = require('@azure/msal-node');
 const { ConfidentialClientApplication } = require('@azure/msal-node');
 require('dotenv').config();
 

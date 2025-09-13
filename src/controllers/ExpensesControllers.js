@@ -10,9 +10,6 @@ async function getExpenses(req, res) {
   try {
     const folders = await getFolderByName();
     console.log("Fetched folders from Microsoft Graph:", folders);
-
-    //const expenses = await expensesService.getExpenses();
-    //res.status(200).json(expenses.map(expense => Expense.fromDatabaseRow(expense)));
     res.status(200).json(folders);
   } catch (error) {
     console.error("Error fetching expenses:", error);
@@ -88,80 +85,6 @@ async function getMessages(req, res, next) {
 }
 
 // folders.js
-import axios from "axios";
-import { getAccessToken } from "./auth-msal.js"; // tu helper que retorna un access token delegado (acquireTokenSilent)
-
-const G = "https://graph.microsoft.com/v1.0";
-const esc = s => s.replace(/'/g, "''"); // escapar comillas para OData
-
-async function findChildInRoot(name, token) {
-  const url = `${G}/me/mailFolders?$filter=displayName eq '${esc(name)}'&$top=1`;
-  const { data } = await axios.get(url, { headers: { Authorization: `Bearer ${token}` } });
-  return data.value?.[0]?.id || null;
-}
-async function findChildUnder(parentId, name, token) {
-  const url = `${G}/me/mailFolders/${parentId}/childFolders?$filter=displayName eq '${esc(name)}'&$top=1`;
-  const { data } = await axios.get(url, { headers: { Authorization: `Bearer ${token}` } });
-  return data.value?.[0]?.id || null;
-}
-
-/** Resuelve el id de una ruta como "Fianzas/rappi" o "Inbox/Fianzas/rappi" */
-export async function getFolderIdByPath(path) {
-  const token = await getAccessToken();
-  const parts = path.split("/").filter(Boolean);
-
-  // 1) intentar desde raíz
-  let currentId = await findChildInRoot(parts[0], token);
-
-  // 2) si no existe en raíz, probar como subcarpeta de Inbox
-  if (!currentId) {
-    // id de la well-known 'inbox'
-    const { data } = await axios.get(`${G}/me/mailFolders/inbox`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    currentId = await findChildUnder(data.id, parts[0], token);
-    if (!currentId) throw new Error(`No encontré la carpeta raíz "${parts[0]}" ni en la raíz ni bajo Inbox`);
-  }
-
-  // 3) bajar por las siguientes subcarpetas
-  for (let i = 1; i < parts.length; i++) {
-    const nextId = await findChildUnder(currentId, parts[i], token);
-    if (!nextId) throw new Error(`No encontré la subcarpeta "${parts[i]}" dentro de la ruta "${parts.slice(0, i).join("/")}"`);
-    currentId = nextId;
-  }
-  return currentId;
-}
-
-/** Lee mensajes de una ruta; ejemplo: "Fianzas/rappi" */
-async function getMessagesFromFolderPath(path, { top = 25, unreadOnly = false, subjectContains } = {}) {
-  const token = await getAccessToken();
-  const folderId = await getFolderIdByPath(path);
-
-  const params = {
-    $top: Math.min(top, 100),
-    $select: "id,subject,from,receivedDateTime,isRead,hasAttachments",
-    $orderby: "receivedDateTime desc",
-  };
-  const headers = { Authorization: `Bearer ${token}` };
-
-  if (unreadOnly) params.$filter = "isRead eq false";
-  if (subjectContains) {
-    headers.ConsistencyLevel = "eventual";
-    params.$search = `"${subjectContains}"`;
-  }
-
-  // paginación simple
-  let url = `${G}/me/mailFolders/${folderId}/messages`;
-  const out = [];
-  while (url && out.length < top) {
-    const { data } = await axios.get(url, { params, headers });
-    out.push(...data.value);
-    url = data["@odata.nextLink"]; // next page
-    // después del primer GET ya no reenvíes params (nextLink los trae)
-    params.$top = params.$select = params.$orderby = params.$filter = params.$search = undefined;
-  }
-  return out.slice(0, top);
-}
 
 
 
