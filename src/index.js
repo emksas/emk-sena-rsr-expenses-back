@@ -1,6 +1,8 @@
 const express = require('express');
 const app = express();
-const expensesRoutes = require('./routes/expensesRoutes');
+
+const expensesRoutes = require('./routes/ExpensesRoutes');
+
 const categoryRoutes = require('./routes/CategoryRoutes');
 const accountRoutes = require('./routes/AccountRoutes');
 const port = 3000;
