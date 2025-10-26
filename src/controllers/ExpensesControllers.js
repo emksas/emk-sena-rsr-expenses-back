@@ -1,33 +1,29 @@
 const expensesService = require("../services/expensesService");
-const Expense = require("../models/Expense");
-const { getFolderByName } = require("../services/grapMail");
 const cca = require("../config/auth").cca;
 const axios = require("axios");
 
 let currentAccount = null;
+/*
 
+jest unit testing with node and splir this file to separete authentication of logic 
+
+*/
 async function getExpenses(req, res) {
   try {
-    const folders = await getFolderByName();
-    console.log("Fetched folders from Microsoft Graph:", folders);
-    res.status(200).json(folders);
+    getMessagesFromFolderPathHandler().then((messages) => {
+      const getExpensesFromEmails = messages.map((email) => email.bodyText);
+      console.log("Fetched expenses from emails:", getExpensesFromEmails);
+      res.status(200).json(getExpensesFromEmails);
+    });
   } catch (error) {
-    console.error("Error fetching expenses:", error);
-    res.status(500).json({ error: "Internal Server Error" });
+    console.log("Error fetching expenses:", error);
+    res.status(500).json({
+      error: "Internal Server Error",
+      description: error.message,
+    });
   }
 }
 
-async function addExpense(req, res) {
-  try {
-    const expense = req.body;
-    console.log("Received expense data:", expense);
-    const expenseId = await expensesService.addExpense(expense);
-    res.status(201).json({ id: expenseId });
-  } catch (error) {
-    console.error("Error adding expense:", error);
-    res.status(500).json({ error: "Internal Server Error" });
-  }
-}
 
 async function authLogin(req, res, next) {
   try {
@@ -99,6 +95,7 @@ async function findChildInRoot(name, token) {
   });
   return data.value?.[0]?.id || null;
 }
+
 async function findChildUnder(parentId, name, token) {
   const url = `${G}/me/mailFolders/${parentId}/childFolders?$filter=displayName eq '${esc(
     name
@@ -309,7 +306,7 @@ function parseRappiCardText(rawText) {
 /** Lee mensajes de una ruta; ejemplo: "Fianzas/rappi" */
 async function getMessagesFromFolderPath(
   path,
-  { top = 25, unreadOnly = false, subjectContains } = {}
+  { top = 200, unreadOnly = false, subjectContains } = {}
 ) {
   const token = await getAccessToken();
   const folderId = await getFolderIdByPath(path);
@@ -333,8 +330,6 @@ async function getMessagesFromFolderPath(
   while (url && out.length < top) {
     const { data } = await axios.get(url, { params, headers });
     console.log("Fetched", data.value.length, "messages");
-    console.log("Ramses messages: ", data.value);
-
     out.push(...data.value);
     url = data["@odata.nextLink"]; // next page
     // después del primer GET ya no reenvíes params (nextLink los trae)
@@ -347,32 +342,26 @@ async function getMessagesFromFolderPath(
   }
 
   const ids = out.map((m) => m.id);
-  console.log("IDs:", ids.join(", "));
   const bodies = await fetchBodiesByBatch(ids);
   for (const m of out) {
     const obj = parseRappiCardText(bodies.get(m.id) || "");
-    console.log("Parsed object:", obj);
     m.bodyText = obj;
   }
-  console.log("TOTAL messages processed:", out.length);
-//  console.log("Final messages with bodies:", out);
-
   return out.slice(0, top);
 }
 
-async function getMessagesFromFolderPathHandler(req, res, next) {
+async function getMessagesFromFolderPathHandler() {
   const correos = await getMessagesFromFolderPath("/Finanzas/rappi", {
-    top: 50, // cuántos quieres
+    top: 200, // cuántos quieres
     unreadOnly: false, // solo no leídos (opcional)
     // subjectContains: "Factura", // búsqueda en asunto/cuerpo (opcional)
   });
 
-  res.json(correos);
+  return correos;
 }
 
 module.exports = {
   getExpenses,
-  addExpense,
   authLogin,
   authRedirect,
   getMessages,
