@@ -1,0 +1,30 @@
+import { cca } from "../config/";
+
+const SCOPES = ["openid", "profile", "Mail.ReadWrite", "offline_access"];
+
+export function buildAuthUrl() {
+
+    return cca.getAuthCodeUrl({
+        scopes: SCOPES,
+        redirectUri: "http://localhost:3000/api/expenses/auth/redirect",
+    })
+}
+
+export async function handleAuthCode(code){
+    const result = await cca.acquireTokenByCode({
+        code,
+        scopes: SCOPES,
+        redirectUri: "http://localhost:3000/api/expenses/auth/redirect",
+    });
+    return result;
+}
+
+export async function getAccessTokenForSession(session){
+    if(!session?.msalAccount){
+        throw new Error("No session provided");
+    }
+
+    const accounts = await cca.getTokenCache().getAllAccounts();
+    const account = accounts.find(acc => acc.homeAccountId === session.msalAccount.homeAccountId);
+    
+}
