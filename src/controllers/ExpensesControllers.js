@@ -1,13 +1,8 @@
-const expensesService = require("../services/expensesService");
-const cca = require("../config/auth").cca;
-const axios = require("axios");
+import {cca} from "../config/auth.js";
+import axios from "axios";
 
 let currentAccount = null;
-/*
 
-jest unit testing with node and splir this file to separete authentication of logic 
-
-*/
 async function getExpenses(req, res) {
   try {
     getMessagesFromFolderPathHandler().then((messages) => {
@@ -23,7 +18,6 @@ async function getExpenses(req, res) {
     });
   }
 }
-
 
 async function authLogin(req, res, next) {
   try {
@@ -360,7 +354,7 @@ async function getMessagesFromFolderPathHandler() {
   return correos;
 }
 
-module.exports = {
+export {
   getExpenses,
   authLogin,
   authRedirect,

@@ -1,15 +1,15 @@
-const express = require('express');
+import express from 'express';
+import {router} from './routes/ExpensesRoutes.js';
+
 const app = express();
-
-const expensesRoutes = require('./routes/ExpensesRoutes');
-
 const port = 3000;
-
 app.use(express.json());
-app.use('/api/expenses', expensesRoutes);
-
+app.get('/', (req, res) => {
+  res.send('Welcome to the Expense Tracker API');
+});
+app.use('/api/expenses', router);
 app.listen(port, () => {
   console.log(`Server is running at http://localhost:${port}`);
 });
 
-module.exports = app; 
+  export default app;

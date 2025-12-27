@@ -1,5 +1,4 @@
-const { ConfidentialClientApplication } = require('@azure/msal-node');
-const path = require('path');
+import {ConfidentialClientApplication} from '@azure/msal-node';
 
 const cca = new ConfidentialClientApplication({
   auth: {
@@ -9,4 +8,4 @@ const cca = new ConfidentialClientApplication({
   },
 });
 
-module.exports = { cca };
+export { cca };

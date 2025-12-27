@@ -1,4 +1,4 @@
-const db = require('../config/db');
+import db from "../config/";
 
 async function getExpenses() {
     return new Promise((resolve, reject) => {
@@ -25,7 +25,7 @@ async function addExpense(expense) {
     });
 }
 
-module.exports = {
+export {
     getExpenses,
     addExpense
 };

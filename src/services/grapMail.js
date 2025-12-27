@@ -1,10 +1,9 @@
-const axios = require("axios");
-const { getAppToken } = require("../config/auth");
+import axios from "axios";
+import { getAppToken, getDelegatedToken } from "../config/auth.js";
+
 const targetUser = encodeURIComponent(
   "rammses.93_outlook.com#EXT#@rammses93outlook.onmicrosoft.com"
 );
-
-const { getDelegatedToken } = require("../config/auth");
 
 async function getFolderByName() {
   const token = await getDelegatedToken();
@@ -14,4 +13,4 @@ async function getFolderByName() {
   console.log("Me:", me.data.userPrincipalName);
 }
 
-module.exports = { getFolderByName };
+export { getFolderByName };

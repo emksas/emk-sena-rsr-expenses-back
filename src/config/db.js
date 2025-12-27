@@ -1,4 +1,4 @@
-const mysql = require('mysql2');
+import mysql from 'mysql2/';
 
 const pool = mysql.createPool({
   host: '127.0.0.1',      // ✅ Solo el nombre o la IP
@@ -11,7 +11,7 @@ const pool = mysql.createPool({
   queueLimit: 0
 });
 
+export default pool;
 
-module.exports = pool;
 
 

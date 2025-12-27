@@ -10,7 +10,7 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "type": "commonjs",
+  "type": "module",
   "dependencies": {
     "@azure/msal-node": "^3.7.3",
     "@microsoft/microsoft-graph-client": "^3.0.7",

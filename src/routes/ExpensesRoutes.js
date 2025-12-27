@@ -1,14 +1,16 @@
-const express = require('express');
-const multer = require('multer');
+import express from 'express';
+import multer from 'multer';
+import {getExpenses, authLogin, authRedirect, getMessagesFromFolderPathHandler} from '../controllers/ExpensesControllers.js';
+
+const routerExpenses = express.Router();
 const router = express.Router();
-const upload = multer(); 
-const expensesController = require('../controllers/ExpensesControllers');
+const upload = multer();
 
-router.get('/', upload.none(), expensesController.getExpenses);
-router.get('/auth/login', expensesController.authLogin);
-router.get('/auth/redirect', expensesController.authRedirect);
-router.get('/messages', expensesController.getMessages);
+routerExpenses.get('/expenses/', upload.none(), getExpenses);
+routerExpenses.get('/auth/login', authLogin);
+routerExpenses.get('/auth/redirect', authRedirect);
+routerExpenses.post('/messagesFromFolder', getMessagesFromFolderPathHandler);
 
-router.post('/messagesFromFolder', expensesController.getMessagesFromFolderPathHandler);
+router.use('/expenses', routerExpenses);
 
-module.exports = router;
+export {router};
