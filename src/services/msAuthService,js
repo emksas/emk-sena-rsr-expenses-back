@@ -10,7 +10,7 @@ export function buildAuthUrl() {
     })
 }
 
-export async function handleAuthCode(code){
+export async function handleAuthCode(code: any){
     const result = await cca.acquireTokenByCode({
         code,
         scopes: SCOPES,
@@ -19,12 +19,22 @@ export async function handleAuthCode(code){
     return result;
 }
 
-export async function getAccessTokenForSession(session){
+export async function getAccessTokenForSession(session: any){
     if(!session?.msalAccount){
         throw new Error("No session provided");
     }
 
     const accounts = await cca.getTokenCache().getAllAccounts();
     const account = accounts.find(acc => acc.homeAccountId === session.msalAccount.homeAccountId);
-    
+
+    if(!account){
+        throw new Error("No account found for the session");
+    }
+
+    const result = await cca.acquireTokenSilent({
+        account,
+        scopes: ["Mail.ReadWrite"],
+    });
+
+    return result.accessToken;
 }
