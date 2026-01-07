@@ -7,8 +7,6 @@ const router = express.Router();
 const upload = multer();
 
 routerExpenses.get('/expenses/', upload.none(), getExpenses);
-routerExpenses.get('/auth/login', authLogin);
-routerExpenses.get('/auth/redirect', authRedirect);
 routerExpenses.post('/messagesFromFolder', getMessagesFromFolderPathHandler);
 
 router.use('/expenses', routerExpenses);

@@ -1,25 +1,34 @@
-import { cca } from "../config/";
+import { encrypt } from "../utils/crypto.js";
+import { cca } from "../config/auth.js";
 
 const SCOPES = ["openid", "profile", "Mail.ReadWrite", "offline_access"];
 
-export function buildAuthUrl() {
+function buildAuthUrl() {
 
     return cca.getAuthCodeUrl({
         scopes: SCOPES,
-        redirectUri: "http://localhost:3000/api/expenses/auth/redirect",
+        redirectUri: "http://localhost:3000/api/auth/redirect",
     })
 }
 
-export async function handleAuthCode(code: any){
+async function handleAuthCode(code){
     const result = await cca.acquireTokenByCode({
         code,
         scopes: SCOPES,
-        redirectUri: "http://localhost:3000/api/expenses/auth/redirect",
+        redirectUri: "http://localhost:3000/api/auth/redirect",
     });
+
+    const cacheString = cca.getTokenCache().serialize();
+    console.log("msal cache after acquireTokenByCode:", cacheString);
+    const cacheStringEncode = 
+    console.log("msal cache (encrypted):", cacheStringEncode);
+
+
+
     return result;
 }
 
-export async function getAccessTokenForSession(session: any){
+async function getAccessTokenForSession(session){
     if(!session?.msalAccount){
         throw new Error("No session provided");
     }
@@ -38,3 +47,5 @@ export async function getAccessTokenForSession(session: any){
 
     return result.accessToken;
 }
+
+export { buildAuthUrl, handleAuthCode, getAccessTokenForSession };

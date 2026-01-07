@@ -1,6 +1,6 @@
 import { buildAuthUrl, handleAuthCode } from "../services/msAuthService.js";
 
-export async function authLogin(req, res, next) {
+async function authLogin(req, res, next) {
   try {
     const url = await buildAuthUrl();
     res.redirect(url);
@@ -9,11 +9,20 @@ export async function authLogin(req, res, next) {
   }
 }
 
-export async function authRedirect(req, res, next) {
+async function authRedirect(req, res, next) {
   try {
+
+
+    console.log("Código de autorización recibido:", req.query.code);
+    console.log("query:", req.query);
+    // console.log("session:", req.session);
+
     const result = await handleAuthCode(req.query.code);
 
-    // guarda SOLO lo necesario en session (no tokens)  
+    // console.log(result);
+    console.log("✅ Autenticado como:", result.account.username);
+
+    /*
     req.session.msalAccount = {
       homeAccountId: result.account.homeAccountId,
       username: result.account.username,
@@ -21,7 +30,10 @@ export async function authRedirect(req, res, next) {
     };
 
     res.send(`✅ Autenticado como ${result.account.username}.`);
+    */
   } catch (e) {
     next(e);
   }
 }
+
+export { authLogin, authRedirect };

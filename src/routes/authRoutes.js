@@ -1,5 +1,5 @@
-import express from 'exporess';
-import {authLogin, authRedirect} from '../controllers/AuthControllers.js';
+import express from 'express';
+import {authLogin, authRedirect} from '../controllers/authController.js';
 
 const routerAuth = express.Router();
 
