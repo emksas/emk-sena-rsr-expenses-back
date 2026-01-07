@@ -13,7 +13,7 @@ export async function authRedirect(req, res, next) {
   try {
     const result = await handleAuthCode(req.query.code);
 
-    // guarda SOLO lo necesario en session (no tokens)
+    // guarda SOLO lo necesario en session (no tokens)  
     req.session.msalAccount = {
       homeAccountId: result.account.homeAccountId,
       username: result.account.username,
