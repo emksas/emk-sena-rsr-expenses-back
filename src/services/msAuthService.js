@@ -1,4 +1,4 @@
-import { encrypt } from "../utils/crypto.js";
+import { encrypt } from "../security/crypto.js";
 import { cca } from "../config/auth.js";
 
 const SCOPES = ["openid", "profile", "Mail.ReadWrite", "offline_access"];
@@ -19,13 +19,13 @@ async function handleAuthCode(code){
     });
 
     const cacheString = cca.getTokenCache().serialize();
-    console.log("msal cache after acquireTokenByCode:", cacheString);
-    const cacheStringEncode = 
+
+    const cacheStringEncode = encrypt(cacheString);
     console.log("msal cache (encrypted):", cacheStringEncode);
 
 
 
-    return result;
+    return {tokenByCode: result, tokenString: cacheStringEncode};
 }
 
 async function getAccessTokenForSession(session){

@@ -1,9 +1,11 @@
+console.log("MSAL_CACHE_ENC_KEY length:", process.env.MSAL_CACHE_ENC_KEY?.length);
+
 import express from 'express';
 import {routerAuth} from './routes/authRoutes.js';
+import { router } from './routes/expenseRoutes.js';
 
 const app = express();
 const port = 3000;
-
 app.use('/api', routerAuth);
 app.use(express.json());
 
