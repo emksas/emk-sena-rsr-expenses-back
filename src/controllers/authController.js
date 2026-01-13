@@ -24,6 +24,8 @@ async function authRedirect(req, res, next) {
       tokenString: result.tokenString,
     });
 
+    
+
     res.send(`✅ Autenticado como ${result.tokenByCode.account.username}.`);
   } catch (e) {
     next(e);

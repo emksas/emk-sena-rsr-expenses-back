@@ -70,10 +70,15 @@ export async function fetchBodiesByBatch(ids, token) {
 export async function getMessagesFromFolderPath(
   path,
   token,
-  parseFn,
+  // parseFn,
   { top = 200 } = {}
 ) {
   const folderId = await getFolderIdByPath(path, token);
+
+  console.log("Getting messages from path:", path);
+  console.log("Using token:", token );
+  console.log("Folder ID:", folderId);
+
 
   const params = {
     $top: Math.min(top, 100),
@@ -95,9 +100,10 @@ export async function getMessagesFromFolderPath(
   const ids = out.map((m) => m.id);
   const bodies = await fetchBodiesByBatch(ids, token);
 
+  /*
   for (const m of out) {
     m.bodyText = parseFn(bodies.get(m.id) || "");
   }
-
+  */
   return out.slice(0, top);
 }

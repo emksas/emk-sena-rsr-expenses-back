@@ -1,6 +1,6 @@
 import { getAccessTokenForSession } from "../services/msAuthService.js";
 import { getMessagesFromFolderPath } from "../services/mailService.js";
-import { parseRappiCardText } from "../services/parser.js"; // aquí mueves tus utils/parser
+//import { parseRappiCardText } from "../services/parser.js"; // aquí mueves tus utils/parser
 
 export async function getExpenses(req, res, next) {
   try {
@@ -9,7 +9,7 @@ export async function getExpenses(req, res, next) {
     const emails = await getMessagesFromFolderPath(
       "/Finanzas/rappi",
       token,
-      parseRappiCardText,
+  //    parseRappiCardText,
       { top: 200 }
     );
 

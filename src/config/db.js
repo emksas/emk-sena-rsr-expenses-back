@@ -1,17 +1,11 @@
-import mysql from 'mysql2/';
+const { Pool } = require('pg');
 
-const pool = mysql.createPool({
-  host: '127.0.0.1',      // ✅ Solo el nombre o la IP
-  port: 3306,              // ✅ Puerto en parámetro separado
-  user: 'root',
-  password: 'Isis1998',
-  database: 'emk',
-  waitForConnections: true,
-  connectionLimit: 10,
-  queueLimit: 0
+const pool = new Pool({
+  user: process.env.DB_USER, // Por defecto: postgres
+  host: process.env.DB_HOST,
+  database: process.env.DB_NAME,
+  password: process.env.DB_PASSWORD,
+  port: process.env.DB_PORT ? Number.parseInt(process.env.DB_PORT) : 5432, 
 });
 
-export default pool;
-
-
-
+module.exports = pool;
