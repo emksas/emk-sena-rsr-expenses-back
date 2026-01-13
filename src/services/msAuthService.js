@@ -25,7 +25,7 @@ async function handleAuthCode(code){
 
 
 
-    return {tokenByCode: result, tokenString: cacheStringEncode};
+    return {tokenByCode: result, cacheEncrypted: cacheStringEncode};
 }
 
 async function getAccessTokenForSession(session){

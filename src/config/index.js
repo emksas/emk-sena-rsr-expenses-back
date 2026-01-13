@@ -1,3 +1,3 @@
 export { apiBase } from './api.js';
 export { cca } from './auth.js';
-export { db } from './database.js';
+export { db } from './db.js';

@@ -8,7 +8,7 @@ async function getUserInformation() {
             }
             resolve(results);
         });
-    }); 
+    });
 }
 
 async function getUserById(userId) {
@@ -26,8 +26,15 @@ async function getUserById(userId) {
 
 async function createUserInformation(user) {
     return new Promise((resolve, reject) => {
-        const query = 'INSERT INTO usuario ( nombre, email) VALUES (?, ?)';
-        db.query(query, [user.nombre, user.email], (error, results) => {
+        const query = 'INSERT INTO public.user_configuration( user_id, home_account_id, username, tenant_id, cache_encrypted ) VALUES (?, ?, ?, ?, ?)';
+        db.query(query, [
+                user.user_id,
+                user.home_account_id,
+                user.username,
+                user.tenant_id,
+                user.cache_encrypted
+            ], (error, results) => {
+
             if (error) {
                 return reject(error);
             }
@@ -37,7 +44,7 @@ async function createUserInformation(user) {
 }
 
 export {
-    getUserInformation, 
+    getUserInformation,
     getUserById,
     createUserInformation
 };
