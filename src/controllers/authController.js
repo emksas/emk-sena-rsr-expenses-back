@@ -32,7 +32,7 @@ async function authRedirect(req, res, next) {
     } else {
       console.log("Creando nuevo usuario en la base de datos para ID:", userId);
       const user = {
-        user_id: "1032459533",
+        user_id: userId,
         home_account_id: result.tokenByCode.account.homeAccountId,
         username: result.tokenByCode.account.username,
         tenant_id: result.tokenByCode.account.tenantId,
