@@ -1,13 +1,15 @@
 import { buildAuthUrl, handleAuthCode } from "../services/msAuthService.js";
-import { createUserInformation, getUserById } from "../services/UserService.js";
 
-const userId = "";
+let userId = "";
 
 async function authLogin(req, res, next) {
   try {
     const url = await buildAuthUrl();
-    userId = req.params.id;
-    console.log("Iniciando autenticación para el usuario ID:", userId);
+    console.log("ramses data login: ", url);
+    if( req.params.id  ){
+      userId = req.params.id;
+      console.log("Iniciando autenticación para el usuario ID:", userId);
+    }
     res.redirect(url);
   } catch (e) {
     next(e);
@@ -21,6 +23,7 @@ async function authRedirect(req, res, next) {
 
     const result = await handleAuthCode(req.query.code);
 
+    /*
     const existingUser = await getUserById(userId);
     console.log( "User information registed: ", existingUser );
 
@@ -41,8 +44,11 @@ async function authRedirect(req, res, next) {
       console.log("Resultado de handleAuthCode:", user);
       await createUserInformation(user);
 
-      res.send(`✅ Autenticado como ${result.tokenByCode.account.username}.`);
+
     }
+      */
+
+    res.send(`✅ Autenticado como ${result.tokenByCode.account.username}.`);
   } catch (e) {
     next(e);
   }
