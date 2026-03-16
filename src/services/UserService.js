@@ -1,8 +1,8 @@
-import db from "../config/";
+import pool from "../config/db.js";
 
 async function getUserInformation() {
     return new Promise((resolve, reject) => {
-        db.query('SELECT * FROM usuario', (error, results) => {
+        pool.query('SELECT * FROM user_information', (error, results) => {
             if (error) {
                 return reject(error);
             }
@@ -11,10 +11,11 @@ async function getUserInformation() {
     });
 }
 
+/*
 async function getUserById(userId) {
     return new Promise((resolve, reject) => {
         const query = 'SELECT * FROM usuario WHERE id = ?';
-        db.query(query, [userId], (error, results) => {
+        pool.query(query, [userId], (error, results) => {
             if (error) {
                 return reject(error);
             }
@@ -27,7 +28,7 @@ async function getUserById(userId) {
 async function createUserInformation(user) {
     return new Promise((resolve, reject) => {
         const query = 'INSERT INTO public.user_configuration( user_id, home_account_id, username, tenant_id, cache_encrypted ) VALUES (?, ?, ?, ?, ?)';
-        db.query(query, [
+        pool.query(query, [
                 user.user_id,
                 user.home_account_id,
                 user.username,
@@ -47,4 +48,10 @@ export {
     getUserInformation,
     getUserById,
     createUserInformation
+};
+*/
+
+
+export {
+    getUserInformation
 };

@@ -1,4 +1,4 @@
-const { Pool } = require('pg');
+import { Pool } from 'pg';
 
 console.log( "Database configuration - DB_USER:", process.env.DB_USER);
 console.log( "Database configuration - DB_HOST:", process.env.DB_HOST);

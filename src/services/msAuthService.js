@@ -1,6 +1,7 @@
 import { encrypt } from "../security/crypto.js";
 import { cca } from "../config/auth.js";
 
+
 const SCOPES = ["openid", "profile", "Mail.ReadWrite", "offline_access"];
 
 function buildAuthUrl() {
@@ -48,4 +49,8 @@ async function getAccessTokenForSession(session){
     return result.accessToken;
 }
 
-export { buildAuthUrl, handleAuthCode, getAccessTokenForSession };
+function getUserInformation(req, res, next) {
+    res.send("Información del usuario");
+}
+
+export { buildAuthUrl, handleAuthCode, getAccessTokenForSession, getUserInformation };

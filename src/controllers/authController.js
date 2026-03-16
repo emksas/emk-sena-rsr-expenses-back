@@ -1,4 +1,5 @@
 import { buildAuthUrl, handleAuthCode } from "../services/msAuthService.js";
+import  { getUserInformation }  from "../services/UserService.js";
 
 let userId = "";
 
@@ -15,6 +16,17 @@ async function authLogin(req, res, next) {
     next(e);
   }
 }
+
+function user_information(req, res, next) {
+  return getUserInformation()
+    .then((results) => {
+      res.json(results);
+    })
+    .catch((error) => {
+      next(error);
+    });
+}
+
 
 async function authRedirect(req, res, next) {
   try {
@@ -54,4 +66,4 @@ async function authRedirect(req, res, next) {
   }
 }
 
-export { authLogin, authRedirect };
+export { authLogin, authRedirect, user_information };
