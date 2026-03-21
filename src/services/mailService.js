@@ -73,7 +73,7 @@ export async function fetchBodiesByBatch(ids, token) {
 export async function getMessagesFromFolderPath(
   path,
   token,
-  // parseFn,
+  parseFn,
   { top = 200 } = {},
 ) {
   const folderId = await getFolderIdByPath(path, token);
@@ -103,8 +103,9 @@ export async function getMessagesFromFolderPath(
   const bodies = await fetchBodiesByBatch(ids, token);
 
   for (const m of out) {
-    m.bodyText = bodies.get(m.id) || "";
-    //m.bodyText = parseFn(bodies.get(m.id) || "");
+    //m.bodyText = bodies.get(m.id) || "";
+    m.bodyText = parseFn(bodies.get(m.id) || "");
+    console.log(`Parsed message ${m.id}:`, m.bodyText);
   }
 
   return out.slice(0, top);

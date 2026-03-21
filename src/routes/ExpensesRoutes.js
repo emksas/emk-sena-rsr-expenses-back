@@ -1,9 +1,8 @@
 import express from 'express';
-import multer from 'multer';
-import {getExpenses} from '../controllers/ExpensesControllers.js';
+import {getExpensesRappi} from '../controllers/ExpensesControllers.js';
 
 const routerExpenses = express.Router();
 
-routerExpenses.get('/expenses', getExpenses);
+routerExpenses.get('/expenses', getExpensesRappi);
 
 export {routerExpenses}
