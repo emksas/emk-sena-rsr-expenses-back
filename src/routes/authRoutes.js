@@ -1,8 +1,8 @@
 import express from 'express';
 import {authLogin, authRedirect, user_information} from '../controllers/authController.js';
+import session from 'express-session';
 
 const routerAuth = express.Router();
-
 
 /**
  * @swagger
@@ -21,6 +21,8 @@ routerAuth.get('/auth/login{/:id}', authLogin);
  *     description: Get token to access to microsoft account
  */
 routerAuth.get('/auth/redirect', authRedirect);
+
+
 
 routerAuth.get('/auth/user-information', user_information);
 

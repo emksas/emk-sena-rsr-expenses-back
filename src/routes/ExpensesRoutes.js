@@ -3,12 +3,7 @@ import multer from 'multer';
 import {getExpenses} from '../controllers/ExpensesControllers.js';
 
 const routerExpenses = express.Router();
-const router = express.Router();
-const upload = multer();
 
-routerExpenses.get('/expenses/', upload.none(), getExpenses);
-//routerExpenses.post('/messagesFromFolder', getMessagesFromFolderPathHandler);
+routerExpenses.get('/expenses', getExpenses);
 
-router.use('/expenses', routerExpenses);
-
-export {router};
+export {routerExpenses}

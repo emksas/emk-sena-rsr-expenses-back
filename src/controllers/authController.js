@@ -30,11 +30,26 @@ function user_information(req, res, next) {
 
 async function authRedirect(req, res, next) {
   try {
+    /*
     console.log("Código de autorización recibido:", req.query.code);
     console.log("query:", req.query);
-
+    */
     const result = await handleAuthCode(req.query.code);
 
+    console.log("Resultado de handleAuthCode:", result);
+
+    const user = {
+        user_id: userId,
+        home_account_id: result.tokenByCode.account.homeAccountId,
+        username: result.tokenByCode.account.username,
+        tenant_id: result.tokenByCode.account.tenantId,
+        cache_encrypted: result.cacheEncrypted,
+      };
+
+    req.session.msalAccount = user;
+    console.log("Sesión después de asignar msalAccount:", req.session);
+
+    // req.session.msalAccount = result.tokenByCode.accessToken;
     /*
     const existingUser = await getUserById(userId);
     console.log( "User information registed: ", existingUser );

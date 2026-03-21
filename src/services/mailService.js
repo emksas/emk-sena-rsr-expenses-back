@@ -4,7 +4,7 @@ const esc = (s) => s.replace(/'/g, "''");
 
 async function findChildInRoot(name, token) {
   const url = `${G}/me/mailFolders?$filter=displayName eq '${esc(
-    name
+    name,
   )}'&$top=1`;
   const { data } = await graphGet(url, token);
   return data.value?.[0]?.id || null;
@@ -12,7 +12,7 @@ async function findChildInRoot(name, token) {
 
 async function findChildUnder(parentId, name, token) {
   const url = `${G}/me/mailFolders/${parentId}/childFolders?$filter=displayName eq '${esc(
-    name
+    name,
   )}'&$top=1`;
   const { data } = await graphGet(url, token);
   return data.value?.[0]?.id || null;
@@ -59,7 +59,10 @@ export async function fetchBodiesByBatch(ids, token) {
 
     for (const r of data.responses) {
       const realId = slice[Number(r.id) - 1];
-      results.set(realId, r.status === 200 ? r.body?.body?.content ?? "" : "");
+      results.set(
+        realId,
+        r.status === 200 ? (r.body?.body?.content ?? "") : "",
+      );
     }
   }
 
@@ -71,14 +74,13 @@ export async function getMessagesFromFolderPath(
   path,
   token,
   // parseFn,
-  { top = 200 } = {}
+  { top = 200 } = {},
 ) {
   const folderId = await getFolderIdByPath(path, token);
 
   console.log("Getting messages from path:", path);
-  console.log("Using token:", token );
+  console.log("Using token:", token);
   console.log("Folder ID:", folderId);
-
 
   const params = {
     $top: Math.min(top, 100),
@@ -100,10 +102,10 @@ export async function getMessagesFromFolderPath(
   const ids = out.map((m) => m.id);
   const bodies = await fetchBodiesByBatch(ids, token);
 
-  /*
   for (const m of out) {
-    m.bodyText = parseFn(bodies.get(m.id) || "");
+    m.bodyText = bodies.get(m.id) || "";
+    //m.bodyText = parseFn(bodies.get(m.id) || "");
   }
-  */
+
   return out.slice(0, top);
 }

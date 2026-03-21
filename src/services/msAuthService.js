@@ -30,12 +30,14 @@ async function handleAuthCode(code){
 }
 
 async function getAccessTokenForSession(session){
+
     if(!session?.msalAccount){
         throw new Error("No session provided");
     }
 
-    const accounts = await cca.getTokenCache().getAllAccounts();
-    const account = accounts.find(acc => acc.homeAccountId === session.msalAccount.homeAccountId);
+    const account = await cca
+        .getTokenCache()
+        .getAccountByHomeId(session.msalAccount.home_account_id);
 
     if(!account){
         throw new Error("No account found for the session");

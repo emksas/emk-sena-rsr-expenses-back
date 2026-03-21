@@ -4,16 +4,17 @@ import { getMessagesFromFolderPath } from "../services/mailService.js";
 
 export async function getExpenses(req, res, next) {
   try {
+    console.log( req.session );
     const token = await getAccessTokenForSession(req.session);
 
     const emails = await getMessagesFromFolderPath(
       "/Finanzas/rappi",
       token,
-  //    parseRappiCardText,
       { top: 200 }
     );
 
-    res.json(emails.map((e) => e.bodyText));
+    console.log("Emails obtenidos:", emails.length);
+
   } catch (e) {
     next(e);
   }
