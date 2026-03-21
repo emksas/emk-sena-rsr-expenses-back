@@ -6,10 +6,12 @@ let userId = "";
 async function authLogin(req, res, next) {
   try {
     const url = await buildAuthUrl();
-    console.log("ramses data login: ", url);
-    if( req.params.id  ){
-      userId = req.params.id;
-      console.log("Iniciando autenticación para el usuario ID:", userId);
+
+    console.log("URL de autenticación generada:", url);
+    console.log( "id del usuario recibido en authLogin:", req.query.id );
+
+    if( req.query.id  ){
+      userId = req.query.id;
     }
     res.redirect(url);
   } catch (e) {
@@ -17,27 +19,18 @@ async function authLogin(req, res, next) {
   }
 }
 
-function user_information(req, res, next) {
-  return getUserInformation()
-    .then((results) => {
-      res.json(results);
-    })
-    .catch((error) => {
-      next(error);
-    });
-}
+
 
 
 async function authRedirect(req, res, next) {
   try {
-    /*
-    console.log("Código de autorización recibido:", req.query.code);
-    console.log("query:", req.query);
-    */
+
     const result = await handleAuthCode(req.query.code);
 
-    console.log("Resultado de handleAuthCode:", result);
 
+
+    /*
+    
     const user = {
         user_id: userId,
         home_account_id: result.tokenByCode.account.homeAccountId,
@@ -45,14 +38,11 @@ async function authRedirect(req, res, next) {
         tenant_id: result.tokenByCode.account.tenantId,
         cache_encrypted: result.cacheEncrypted,
       };
-
+    
     req.session.msalAccount = user;
-    console.log("Sesión después de asignar msalAccount:", req.session);
+    */    
 
-    // req.session.msalAccount = result.tokenByCode.accessToken;
-    /*
     const existingUser = await getUserById(userId);
-    console.log( "User information registed: ", existingUser );
 
     if (existingUser) {
       console.log("Usuario ya existe en la base de datos:", existingUser);
@@ -73,12 +63,13 @@ async function authRedirect(req, res, next) {
 
 
     }
-      */
+      
 
     res.send(`✅ Autenticado como ${result.tokenByCode.account.username}.`);
+
   } catch (e) {
     next(e);
   }
 }
 
-export { authLogin, authRedirect, user_information };
+export { authLogin, authRedirect };

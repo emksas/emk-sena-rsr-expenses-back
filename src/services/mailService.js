@@ -78,10 +78,6 @@ export async function getMessagesFromFolderPath(
 ) {
   const folderId = await getFolderIdByPath(path, token);
 
-  console.log("Getting messages from path:", path);
-  console.log("Using token:", token);
-  console.log("Folder ID:", folderId);
-
   const params = {
     $top: Math.min(top, 100),
     $select: "id,subject,from,receivedDateTime,isRead",
@@ -103,7 +99,6 @@ export async function getMessagesFromFolderPath(
   const bodies = await fetchBodiesByBatch(ids, token);
 
   for (const m of out) {
-    //m.bodyText = bodies.get(m.id) || "";
     m.bodyText = parseFn(bodies.get(m.id) || "");
     console.log(`Parsed message ${m.id}:`, m.bodyText);
   }
