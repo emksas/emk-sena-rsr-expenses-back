@@ -1,48 +1,27 @@
 import { buildAuthUrl, handleAuthCode } from "../services/msAuthService.js";
-import  { getUserInformation }  from "../services/UserService.js";
-
-let userId = "";
+import  { getUserById, createUserInformation }  from "../services/UserService.js";
 
 async function authLogin(req, res, next) {
   try {
-    const url = await buildAuthUrl();
-
-    console.log("URL de autenticación generada:", url);
-    console.log( "id del usuario recibido en authLogin:", req.query.id );
-
-    if( req.query.id  ){
-      userId = req.query.id;
-    }
+    let url = await buildAuthUrl( req.query.id );
     res.redirect(url);
   } catch (e) {
     next(e);
   }
 }
 
-
-
-
 async function authRedirect(req, res, next) {
   try {
 
-    const result = await handleAuthCode(req.query.code);
+    const { code, state } = req.query;
+    const parsedState = state ? JSON.parse(state) : {};
+    console.log("Parsed state:", parsedState);
+    const userId = parsedState?.userId;
+    console.log("User ID from state:", userId);
+    const result = await handleAuthCode(code);  
+    const existingUser = await getUserById(userId, result.tokenByCode.account.homeAccountId);
 
-
-
-    /*
-    
-    const user = {
-        user_id: userId,
-        home_account_id: result.tokenByCode.account.homeAccountId,
-        username: result.tokenByCode.account.username,
-        tenant_id: result.tokenByCode.account.tenantId,
-        cache_encrypted: result.cacheEncrypted,
-      };
-    
-    req.session.msalAccount = user;
-    */    
-
-    const existingUser = await getUserById(userId);
+    console.log("Resultado de getUserById:", existingUser);
 
     if (existingUser) {
       console.log("Usuario ya existe en la base de datos:", existingUser);
@@ -60,8 +39,6 @@ async function authRedirect(req, res, next) {
       };
       console.log("Resultado de handleAuthCode:", user);
       await createUserInformation(user);
-
-
     }
       
 

@@ -1,58 +1,64 @@
 import { encrypt } from "../security/crypto.js";
 import { cca } from "../config/auth.js";
 
-
 const SCOPES = ["openid", "profile", "Mail.ReadWrite", "offline_access"];
 
-function buildAuthUrl() {
+function buildAuthUrl(userId) {
+  
+  console.log( "Construyendo URL de autenticación con userId:", ( userId ?? " nofunciona" ) );
 
-    return cca.getAuthCodeUrl({
-        scopes: SCOPES,
-        redirectUri: "http://localhost:3000/api/auth/redirect",
-    })
+  return cca.getAuthCodeUrl({
+    scopes: SCOPES,
+    redirectUri: "http://localhost:3000/api/auth/redirect",
+    state: JSON.stringify({
+        userId: userId ?? undefined,
+    }),
+  });
 }
 
-async function handleAuthCode(code){
-    const result = await cca.acquireTokenByCode({
-        code,
-        scopes: SCOPES,
-        redirectUri: "http://localhost:3000/api/auth/redirect",
-    });
+async function handleAuthCode(code) {
+  const result = await cca.acquireTokenByCode({
+    code,
+    scopes: SCOPES,
+    redirectUri: "http://localhost:3000/api/auth/redirect",
+  });
 
-    const cacheString = cca.getTokenCache().serialize();
+  const cacheString = cca.getTokenCache().serialize();
 
-    const cacheStringEncode = encrypt(cacheString);
-    console.log("msal cache (encrypted):", cacheStringEncode);
+  const cacheStringEncode = encrypt(cacheString);
+  console.log("msal cache (encrypted):", cacheStringEncode);
 
-
-
-    return {tokenByCode: result, cacheEncrypted: cacheStringEncode};
+  return { tokenByCode: result, cacheEncrypted: cacheStringEncode };
 }
 
-async function getAccessTokenForSession(session){
+async function getAccessTokenForSession(session) {
+  if (!session?.msalAccount) {
+    throw new Error("No session provided");
+  }
 
-    if(!session?.msalAccount){
-        throw new Error("No session provided");
-    }
+  const account = await cca
+    .getTokenCache()
+    .getAccountByHomeId(session.msalAccount.home_account_id);
 
-    const account = await cca
-        .getTokenCache()
-        .getAccountByHomeId(session.msalAccount.home_account_id);
+  if (!account) {
+    throw new Error("No account found for the session");
+  }
 
-    if(!account){
-        throw new Error("No account found for the session");
-    }
+  const result = await cca.acquireTokenSilent({
+    account,
+    scopes: ["Mail.ReadWrite"],
+  });
 
-    const result = await cca.acquireTokenSilent({
-        account,
-        scopes: ["Mail.ReadWrite"],
-    });
-
-    return result.accessToken;
+  return result.accessToken;
 }
 
 function getUserInformation(req, res, next) {
-    res.send("Información del usuario");
+  res.send("Información del usuario");
 }
 
-export { buildAuthUrl, handleAuthCode, getAccessTokenForSession, getUserInformation };
+export {
+  buildAuthUrl,
+  handleAuthCode,
+  getAccessTokenForSession,
+  getUserInformation,
+};

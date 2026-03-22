@@ -14,7 +14,7 @@ async function getUserInformation() {
 async function createUserInformation(user) {
   return new Promise((resolve, reject) => {
     const query =
-      "INSERT INTO public.user_information(id, user_id, home_account_id, username, tenant_id, cache_encrypted) VALUES (?, ?, ?, ?, ?, ?);";
+      "INSERT INTO public.user_information( user_id, home_account_id, username, tenant_id, cache_encrypted) VALUES ($1, $2, $3, $4, $5);";
     pool.query(
       query,
       [
@@ -36,7 +36,7 @@ async function createUserInformation(user) {
 
 async function getUserById(userId, homeAccountId) {
   return new Promise((resolve, reject) => {
-    const query = "SELECT * FROM public.user_information WHERE id = ? and home_account_id = ?;";
+    const query = "SELECT * FROM public.user_information WHERE id = $1 and home_account_id = $2;";
     pool.query(query, [userId, homeAccountId], (error, results) => {
       if (error) {
         return reject(error);
