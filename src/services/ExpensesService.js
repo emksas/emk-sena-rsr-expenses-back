@@ -14,7 +14,9 @@ async function getExpenses() {
 async function addExpense(expense) {
     console.log(expense);
     return new Promise((resolve, reject) => {
-        const query = 'INSERT INTO egreso ( valor, descripcion, estado, idPlanificacion, cuentaContable_id) VALUES (?, ?, ?, ?, ?)';  
+        const query = `INSERT INTO public.egreso(
+	idegreso, amount, descripcion, estado, transactiondate, paymentmethod, authorizationcode, merchant, "userId")
+	VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9);`;  
         db.query(query, [expense.amount, expense.description, expense.state, expense.idPlanification, expense.accountId], (error, results) => {
             if (error) {
                 return reject(error);

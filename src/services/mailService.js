@@ -1,9 +1,9 @@
-import { G, graphGet, graphPost } from "./graphClient.js";
+import { GRAPH_BASE_URL, graphGet, graphPost } from "./graphClient.js";
 
 const esc = (s) => s.replace(/'/g, "''");
 
 async function findChildInRoot(name, token) {
-  const url = `${G}/me/mailFolders?$filter=displayName eq '${esc(
+  const url = `${GRAPH_BASE_URL}/me/mailFolders?$filter=displayName eq '${esc(
     name,
   )}'&$top=1`;
   const { data } = await graphGet(url, token);
@@ -11,11 +11,17 @@ async function findChildInRoot(name, token) {
 }
 
 async function findChildUnder(parentId, name, token) {
-  const url = `${G}/me/mailFolders/${parentId}/childFolders?$filter=displayName eq '${esc(
+  const url = `${GRAPH_BASE_URL}/me/mailFolders/${parentId}/childFolders?$filter=displayName eq '${esc(
     name,
   )}'&$top=1`;
   const { data } = await graphGet(url, token);
   return data.value?.[0]?.id || null;
+}
+
+async function markMessageAsRead(messageId, token) {
+  const url = `${GRAPH_BASE_URL}/me/messages/${messageId}`;
+  const response = await graphPatch(url, token, { isRead: true });
+  return response.data;
 }
 
 export async function getFolderIdByPath(path, token) {
@@ -24,7 +30,10 @@ export async function getFolderIdByPath(path, token) {
   let currentId = await findChildInRoot(parts[0], token);
 
   if (!currentId) {
-    const { data } = await graphGet(`${G}/me/mailFolders/inbox`, token);
+    const { data } = await graphGet(
+      `${GRAPH_BASE_URL}/me/mailFolders/inbox`,
+      token,
+    );
     currentId = await findChildUnder(data.id, parts[0], token);
     if (!currentId)
       throw new Error(`No encontré la carpeta raíz "${parts[0]}"`);
@@ -39,7 +48,7 @@ export async function getFolderIdByPath(path, token) {
 }
 
 export async function fetchBodiesByBatch(ids, token) {
-  const url = `${G}/$batch`;
+  const url = `${GRAPH_BASE_URL}/$batch`;
   const results = new Map();
 
   for (let i = 0; i < ids.length; i += 20) {
@@ -69,7 +78,6 @@ export async function fetchBodiesByBatch(ids, token) {
   return results;
 }
 
-// Aquí llamas tu parseRappiCardText(...) tal cual la tienes (lo puedes importar)
 export async function getMessagesFromFolderPath(
   path,
   token,
@@ -84,14 +92,14 @@ export async function getMessagesFromFolderPath(
     $orderby: "receivedDateTime desc",
   };
 
-  let url = `${G}/me/mailFolders/${folderId}/messages`;
+  let url = `${GRAPH_BASE_URL}/me/mailFolders/${folderId}/messages`;
   const out = [];
 
   while (url && out.length < top) {
     const { data } = await graphGet(url, token, { params });
+    console.log(`Fetched ${data.value.length} messages from ${url}`);
     out.push(...data.value);
     url = data["@odata.nextLink"];
-    // nextLink ya trae params, así que no los reenvíes:
     params.$top = params.$select = params.$orderby = undefined;
   }
 
@@ -100,7 +108,20 @@ export async function getMessagesFromFolderPath(
 
   for (const m of out) {
     m.bodyText = parseFn(bodies.get(m.id) || "");
+    console.log("---------------------------------------");
+    if (m.bodyText.amount && m.bodyText.transactionDate) {
+      console.log(`Message ${m.id} has valid expense data, marking as read.`);
+      /*
+      const messageMarked = await markMessageAsRead(m.id, token);
+      console.log(`Marked message ${m.id} as read:`, messageMarked.isRead);
+      */
+    } else {
+      console.warn(
+        `Message ${m.id} no tiene datos de gasto válidos, no lo marco como leído.`,
+      );
+    }
     console.log(`Parsed message ${m.id}:`, m.bodyText);
+    console.log("---------------------------------------");
   }
 
   return out.slice(0, top);

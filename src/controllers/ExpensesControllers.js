@@ -24,7 +24,7 @@ async function getExpensesRappi(req, res, next) {
       cache_encrypted: userInformation[0].cache_encrypted,
     }
 
-    console.log("path folder:", req.query.pathFolder);
+    // console.log("path folder:", req.query.pathFolder);
     
     const token = await getAccessTokenForSession(userSession);
 
@@ -35,7 +35,7 @@ async function getExpensesRappi(req, res, next) {
       { top: 200 }
     );
 
-    console.log("Emails obtenidos:", emails.length);
+    // console.log("Emails obtenidos:", emails.length);
 
     res.status(200).json({ expenses: emails });
     
