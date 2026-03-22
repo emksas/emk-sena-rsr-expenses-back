@@ -5,8 +5,6 @@ const SCOPES = ["openid", "profile", "Mail.ReadWrite", "offline_access"];
 
 function buildAuthUrl(userId) {
   
-  console.log( "Construyendo URL de autenticación con userId:", ( userId ?? " nofunciona" ) );
-
   return cca.getAuthCodeUrl({
     scopes: SCOPES,
     redirectUri: "http://localhost:3000/api/auth/redirect",
@@ -24,21 +22,19 @@ async function handleAuthCode(code) {
   });
 
   const cacheString = cca.getTokenCache().serialize();
-
   const cacheStringEncode = encrypt(cacheString);
-  console.log("msal cache (encrypted):", cacheStringEncode);
 
   return { tokenByCode: result, cacheEncrypted: cacheStringEncode };
 }
 
 async function getAccessTokenForSession(session) {
-  if (!session?.msalAccount) {
+  if (!session?.home_account_id) {
     throw new Error("No session provided");
   }
 
   const account = await cca
     .getTokenCache()
-    .getAccountByHomeId(session.msalAccount.home_account_id);
+    .getAccountByHomeId(session.home_account_id);
 
   if (!account) {
     throw new Error("No account found for the session");

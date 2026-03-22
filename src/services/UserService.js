@@ -1,16 +1,5 @@
 import pool from "../config/db.js";
 
-async function getUserInformation() {
-  return new Promise((resolve, reject) => {
-    pool.query("SELECT * FROM user_information", (error, results) => {
-      if (error) {
-        return reject(error);
-      }
-      resolve(results);
-    });
-  });
-}
-
 async function createUserInformation(user) {
   return new Promise((resolve, reject) => {
     const query =
@@ -34,7 +23,20 @@ async function createUserInformation(user) {
   });
 }
 
-async function getUserById(userId, homeAccountId) {
+async function getUserById(userId) {
+
+  return new Promise((resolve, reject) => {
+    const query = "SELECT * FROM public.user_information WHERE user_id = $1;";
+    pool.query(query, [parseInt(userId)], (error, results) => {
+      if (error) {
+        return reject(error);
+      }
+      resolve(results.rows);
+    });
+  });
+}
+
+async function getUserByIdAndHomeAccountId(userId, homeAccountId) {
   return new Promise((resolve, reject) => {
     const query = "SELECT * FROM public.user_information WHERE id = $1 and home_account_id = $2;";
     pool.query(query, [userId, homeAccountId], (error, results) => {
@@ -46,4 +48,4 @@ async function getUserById(userId, homeAccountId) {
   });
 }
 
-export { getUserInformation, createUserInformation, getUserById };
+export { createUserInformation, getUserByIdAndHomeAccountId, getUserById };
