@@ -1,4 +1,4 @@
-import { addExpense } from "./ExpensesService.js";
+import { add } from "./ExpensesService.js";
 import { GRAPH_BASE_URL, graphGet, graphPost } from "./graphClient.js";
 
 const esc = (s) => s.replace(/'/g, "''");
@@ -121,7 +121,7 @@ export async function getMessagesFromFolderPath(
         merchant: m.bodyText.merchant,
         userId: userId,
       };
-      const expenseAdded = await addExpense(expenseInformation);
+      const expenseAdded = await add(expenseInformation);
       console.log(`Expense added to database with ID: ${expenseAdded}`);
 
       const messageMarked = await markMessageAsRead(m.id, token);

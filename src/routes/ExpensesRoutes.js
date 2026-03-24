@@ -1,8 +1,8 @@
 import express from "express";
 import {
-  getExpensesRappi,
-  getExpensesByUserId,
-  getExpensesByUserIdAndDateRange,
+  getEmailExpensesRappi,
+  getExpensesByIdUser,
+  getExpensesByUserIdDateRange,
 } from "../controllers/ExpensesControllers.js";
 
 const routerExpenses = express.Router();
@@ -18,7 +18,7 @@ const routerExpenses = express.Router();
  *         content:
  *           application/json:
  */
-routerExpenses.get("/expenses", getExpensesRappi);
+routerExpenses.get("/expenses", getEmailExpensesRappi);
 
 /**
  * @swagger
@@ -35,7 +35,7 @@ routerExpenses.get("/expenses", getExpensesRappi);
  *    200:
  *     description: A list of expenses for the specified user ID
  */
-routerExpenses.get("/expenses/:userId", getExpensesByUserId);
+routerExpenses.get("/expenses/:userId", getExpensesByIdUser);
 
 /**
  * @swagger
@@ -62,7 +62,7 @@ routerExpenses.get("/expenses/:userId", getExpensesByUserId);
  */
 routerExpenses.get(
   "/expenses/:userId/date-range",
-  getExpensesByUserIdAndDateRange,
+  getExpensesByUserIdDateRange,
 );
 
 export { routerExpenses };

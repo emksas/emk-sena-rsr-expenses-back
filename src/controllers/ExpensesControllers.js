@@ -1,7 +1,7 @@
 import { getAccessTokenForSession } from "../services/msAuthService.js";
 import { getMessagesFromFolderPath } from "../services/mailService.js";
 import { parseRappiCardText } from "../services/parser.js";
-import { getUserById } from "../services/UserService.js";
+import { getByUserId, getByUserIdAndDateRange } from "../services/ExpensesService.js";
 
 async function getEmailExpensesRappi(req, res, next) {
   try {
@@ -39,25 +39,31 @@ async function getEmailExpensesRappi(req, res, next) {
   }
 }
 
-async function getExpensesByUserId(req, res, next) {
+async function getExpensesByIdUser(req, res, next) {
   try {
+    console.log(`Fetching expenses for user ${req.params.userId}`);
     const userId = req.params.userId;
-    const expenses = await getExpensesByUserId(userId);
+    console.log(`User ID from request: ${userId}`);
+    const expenses = await getByUserId(userId);
     res.status(200).json({ expenses });
   } catch (e) {
-    next(e);
+    console.error(`Error fetching expenses for user ${req.params.userId}:`, e);
   }
 }
 
-async function getExpensesByUserIdAndDateRange(req, res, next) {
+async function getExpensesByUserIdDateRange(req, res, next) {
   try {
     const userId = req.params.userId;
     const { startDate, endDate } = req.query;
-    const expenses = await getExpensesByUserIdAndDateRange(userId, startDate, endDate);
+    const expenses = await getByUserIdAndDateRange(userId, startDate, endDate);
     res.status(200).json({ expenses });
   } catch (e) {
-    next(e);
+    console.error(`Error fetching expenses for user ${req.params.userId} with date range ${req.query.startDate} - ${req.query.endDate}:`, e);
   }
 }
 
-export { getEmailExpensesRappi as getExpensesRappi, getExpensesByUserId, getExpensesByUserIdAndDateRange };
+export {
+  getEmailExpensesRappi,
+  getExpensesByIdUser,
+  getExpensesByUserIdDateRange
+};
