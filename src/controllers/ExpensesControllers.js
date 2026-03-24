@@ -3,16 +3,16 @@ import { getMessagesFromFolderPath } from "../services/mailService.js";
 import { parseRappiCardText } from "../services/parser.js";
 import { getUserById } from "../services/UserService.js";
 
-async function getExpensesRappi(req, res, next) {
+async function getEmailExpensesRappi(req, res, next) {
   try {
 
     if( !req.query.userId ) {
       return res.status(400).json({ error: "User ID is required" });
     }
 
-    const user_id = req.query.userId;
-    const userInformation = await getUserById(user_id);
-    
+    const userId = req.query.userId;
+    const userInformation = await getUserById(userId);
+
     if( !userInformation || userInformation.length === 0 ) {
       return res.status(404).json({ error: "User not found" });
     }
@@ -24,25 +24,40 @@ async function getExpensesRappi(req, res, next) {
       cache_encrypted: userInformation[0].cache_encrypted,
     }
 
-    // console.log("path folder:", req.query.pathFolder);
-    
     const token = await getAccessTokenForSession(userSession);
-
     const emails = await getMessagesFromFolderPath(
       req.query.pathFolder,
       token,
       parseRappiCardText,
+      userId,
       { top: 200 }
     );
 
-    // console.log("Emails obtenidos:", emails.length);
-
     res.status(200).json({ expenses: emails });
-    
   } catch (e) {
     next(e);
   }
-  
 }
 
-export { getExpensesRappi };
+async function getExpensesByUserId(req, res, next) {
+  try {
+    const userId = req.params.userId;
+    const expenses = await getExpensesByUserId(userId);
+    res.status(200).json({ expenses });
+  } catch (e) {
+    next(e);
+  }
+}
+
+async function getExpensesByUserIdAndDateRange(req, res, next) {
+  try {
+    const userId = req.params.userId;
+    const { startDate, endDate } = req.query;
+    const expenses = await getExpensesByUserIdAndDateRange(userId, startDate, endDate);
+    res.status(200).json({ expenses });
+  } catch (e) {
+    next(e);
+  }
+}
+
+export { getEmailExpensesRappi as getExpensesRappi, getExpensesByUserId, getExpensesByUserIdAndDateRange };

@@ -1,3 +1,4 @@
+import { addExpense } from "./ExpensesService.js";
 import { GRAPH_BASE_URL, graphGet, graphPost } from "./graphClient.js";
 
 const esc = (s) => s.replace(/'/g, "''");
@@ -82,6 +83,7 @@ export async function getMessagesFromFolderPath(
   path,
   token,
   parseFn,
+  userId,
   { top = 200 } = {},
 ) {
   const folderId = await getFolderIdByPath(path, token);
@@ -97,7 +99,6 @@ export async function getMessagesFromFolderPath(
 
   while (url && out.length < top) {
     const { data } = await graphGet(url, token, { params });
-    console.log(`Fetched ${data.value.length} messages from ${url}`);
     out.push(...data.value);
     url = data["@odata.nextLink"];
     params.$top = params.$select = params.$orderby = undefined;
@@ -110,11 +111,21 @@ export async function getMessagesFromFolderPath(
     m.bodyText = parseFn(bodies.get(m.id) || "");
     console.log("---------------------------------------");
     if (m.bodyText.amount && m.bodyText.transactionDate) {
-      console.log(`Message ${m.id} has valid expense data, marking as read.`);
-      /*
+      const expenseInformation = {
+        amount: m.bodyText.amount,
+        description: m.subject,
+        state: "payed",
+        transactionDate: m.bodyText.transactionDate,
+        paymentMethod: m.bodyText.paymentMethod,
+        authorizationCode: m.bodyText.authorizationCode,
+        merchant: m.bodyText.merchant,
+        userId: userId,
+      };
+      const expenseAdded = await addExpense(expenseInformation);
+      console.log(`Expense added to database with ID: ${expenseAdded}`);
+
       const messageMarked = await markMessageAsRead(m.id, token);
       console.log(`Marked message ${m.id} as read:`, messageMarked.isRead);
-      */
     } else {
       console.warn(
         `Message ${m.id} no tiene datos de gasto válidos, no lo marco como leído.`,

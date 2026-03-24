@@ -16,7 +16,7 @@ async function authRedirect(req, res, next) {
     const { code, state } = req.query;
     const parsedState = state ? JSON.parse(state) : {};
     const userId = parsedState?.userId;
-    const result = await handleAuthCode(code);  
+    const result = await handleAuthCode(code);
     const existingUser = await getUserByIdAndHomeAccountId(userId, result.tokenByCode.account.homeAccountId);
 
     if (existingUser) {
@@ -33,7 +33,7 @@ async function authRedirect(req, res, next) {
       };
       await createUserInformation(user);
     }
-      
+
     res.send(`✅ Autenticado como ${result.tokenByCode.account.username}.`);
 
   } catch (e) {
