@@ -1,3 +1,5 @@
+import "dotenv/config";
+
 console.log("MSAL_CACHE_ENC_KEY length:", process.env.MSAL_CACHE_ENC_KEY?.length);
 
 import express from 'express';

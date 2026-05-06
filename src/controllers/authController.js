@@ -16,14 +16,31 @@ async function authLogin(req, res, next) {
 
 async function authRedirect(req, res, next) {
   try {
+
+    console.log("Recibiendo código de autenticación y estado:");
+    console.log("Código:", req.query.code);
+    console.log("Estado:", req.query.state);
+
     const { code, state } = req.query;
-    const parsedState = state ? JSON.parse(state) : {};
-    const userId = parsedState?.userId;
     const result = await handleAuthCode(code);
 
-    const existingUser = await getUserById(userId);
+
+    console.log("params:", req.params);
+
+    //console.log("Resultado de la autenticación:");
+    //console.log(result);
+
+    
+    //const parsedState = state ? JSON.parse(state) : {};
+    //const userId = parsedState?.userId;
+    //console.log("User ID extraído del estado:", userId);
+    
+
+    
+    //const existingUser = await getUserById(userId);
     //const existingUser = await getUserByIdAndHomeAccountId(userId, result.tokenByCode.account.homeAccountId);
 
+    /*
     console.log("Usuario existente en la base de datos:");
     console.log(existingUser);
 
@@ -43,6 +60,9 @@ async function authRedirect(req, res, next) {
       };
       await createUserInformation(user);
     }
+
+    */
+
 
     res.send(`✅ Autenticado como ${result.tokenByCode.account.username}.`);
   } catch (e) {
