@@ -11,7 +11,7 @@ const routerAuth = express.Router();
  *     summary: Login to an microsoft account
  *     description: Get token to access to microsoft account
  */
-routerAuth.get('/auth/login{/:id}', authLogin);
+routerAuth.get('/auth/login/:id', authLogin);
 
 /**
  * @swagger

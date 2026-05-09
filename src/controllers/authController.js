@@ -7,8 +7,12 @@ import {
 
 async function authLogin(req, res, next) {
   try {
-    let url = await buildAuthUrl(req.query.id);
-    res.redirect(url);
+    const { id } = req.params;
+
+    console.log("ID recibido en authLogin:", id);
+
+    const authUrl = await buildAuthUrl(id);
+    res.redirect(authUrl);
   } catch (e) {
     next(e);
   }
@@ -17,34 +21,19 @@ async function authLogin(req, res, next) {
 async function authRedirect(req, res, next) {
   try {
 
-    console.log("Recibiendo código de autenticación y estado:");
-    console.log("Código:", req.query.code);
-    console.log("Estado:", req.query.state);
-
     const { code, state } = req.query;
+    const parsedState = state ? JSON.parse(state) : {};
+    const userId = parsedState.userId;
     const result = await handleAuthCode(code);
-
-
-    console.log("params:", req.params);
-
-    //console.log("Resultado de la autenticación:");
-    //console.log(result);
-
     
-    //const parsedState = state ? JSON.parse(state) : {};
-    //const userId = parsedState?.userId;
-    //console.log("User ID extraído del estado:", userId);
-    
+    console.log("UserId a consultar:", userId);
 
-    
-    //const existingUser = await getUserById(userId);
-    //const existingUser = await getUserByIdAndHomeAccountId(userId, result.tokenByCode.account.homeAccountId);
+    const existingUser = await getUserById(userId);
 
-    /*
     console.log("Usuario existente en la base de datos:");
     console.log(existingUser);
 
-    if (existingUser) {
+    if (existingUser.length > 0) {
       return res.send(
         `✅ Usuario ${existingUser[0].username} ya está autenticado.`,
       );
@@ -60,8 +49,6 @@ async function authRedirect(req, res, next) {
       };
       await createUserInformation(user);
     }
-
-    */
 
 
     res.send(`✅ Autenticado como ${result.tokenByCode.account.username}.`);
