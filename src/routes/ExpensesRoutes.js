@@ -18,7 +18,7 @@ const routerExpenses = express.Router();
  *         content:
  *           application/json:
  */
-routerExpenses.get("/expenses", getEmailExpensesRappi);
+routerExpenses.get("/expenses/:userId", getEmailExpensesRappi);
 
 /**
  * @swagger

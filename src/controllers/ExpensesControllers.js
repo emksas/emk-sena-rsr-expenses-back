@@ -6,14 +6,20 @@ import { getByUserId, getByUserIdAndDateRange } from "../services/ExpensesServic
 async function getEmailExpensesRappi(req, res, next) {
   try {
 
-    if( !req.query.userId ) {
+    console.log('parametros recibidos en getEmailExpensesRappi:', req.params);
+    const { userId } = req.params;
+    console.log(`Fetching expenses for user ${userId}`);
+
+    if (!userId) {
       return res.status(400).json({ error: "User ID is required" });
     }
 
-    const userId = req.query.userId;
-    const userInformation = await getUserById(userId);
 
-    if( !userInformation || userInformation.length === 0 ) {
+    const userInformation = await getByUserId(userId);
+
+    console.log(`User information for user ${userId}:`, userInformation); 
+
+    if (!userInformation || userInformation.length === 0) {
       return res.status(404).json({ error: "User not found" });
     }
 
@@ -26,7 +32,8 @@ async function getEmailExpensesRappi(req, res, next) {
 
     const token = await getAccessTokenForSession(userSession);
     const emails = await getMessagesFromFolderPath(
-      req.query.pathFolder,
+      "/Finanzas/rappi",
+      //req.query.pathFolder,
       token,
       parseRappiCardText,
       userId,
