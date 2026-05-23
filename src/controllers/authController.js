@@ -25,13 +25,7 @@ async function authRedirect(req, res, next) {
     const parsedState = state ? JSON.parse(state) : {};
     const userId = parsedState.userId;
     const result = await handleAuthCode(code);
-    
-    console.log("UserId a consultar:", userId);
-
     const existingUser = await getUserById(userId);
-
-    console.log("Usuario existente en la base de datos:");
-    console.log(existingUser);
 
     if (existingUser.length > 0) {
       return res.send(

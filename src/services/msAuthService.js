@@ -28,6 +28,7 @@ async function handleAuthCode(code) {
 }
 
 async function getAccessTokenForSession(session) {
+  console.log( " desde getAccessTokenForSession ", session.home_account_id )
   if (!session?.home_account_id) {
     throw new Error("No session provided");
   }

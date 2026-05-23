@@ -1,6 +1,6 @@
 import express from "express";
 import {
-  getEmailExpensesRappi,
+  getEmailExpensesFromFolder,
   getExpensesByIdUser,
   getExpensesByUserIdDateRange,
 } from "../controllers/ExpensesControllers.js";
@@ -18,7 +18,7 @@ const routerExpenses = express.Router();
  *         content:
  *           application/json:
  */
-routerExpenses.get("/expenses/:userId", getEmailExpensesRappi);
+routerExpenses.get("/expenses/:userId", getEmailExpensesFromFolder);
 
 /**
  * @swagger

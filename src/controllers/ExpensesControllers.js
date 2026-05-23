@@ -2,22 +2,20 @@ import { getAccessTokenForSession } from "../services/msAuthService.js";
 import { getMessagesFromFolderPath } from "../services/mailService.js";
 import { parseRappiCardText } from "../services/parser.js";
 import { getByUserId, getByUserIdAndDateRange } from "../services/ExpensesService.js";
+import { getUserById } from "../services/UserService.js";
 
-async function getEmailExpensesRappi(req, res, next) {
+async function getEmailExpensesFromFolder(req, res, next) {
   try {
 
-    console.log('parametros recibidos en getEmailExpensesRappi:', req.params);
+    const { folderPath, numberElements } = req.query;
     const { userId } = req.params;
-    console.log(`Fetching expenses for user ${userId}`);
 
     if (!userId) {
       return res.status(400).json({ error: "User ID is required" });
     }
 
-
-    const userInformation = await getByUserId(userId);
-
-    console.log(`User information for user ${userId}:`, userInformation); 
+    const userInformation = await getUserById(userId);
+    console.log(`User information for user ${userId}:`, userInformation[0].home_account_id);
 
     if (!userInformation || userInformation.length === 0) {
       return res.status(404).json({ error: "User not found" });
@@ -30,14 +28,16 @@ async function getEmailExpensesRappi(req, res, next) {
       cache_encrypted: userInformation[0].cache_encrypted,
     }
 
+    console.log("Objeto de usurio de sesion: ", userSession);
     const token = await getAccessTokenForSession(userSession);
+
     const emails = await getMessagesFromFolderPath(
-      "/Finanzas/rappi",
-      //req.query.pathFolder,
+      //"/Finanzas/rappi",
+      folderPath,
       token,
       parseRappiCardText,
       userId,
-      { top: 200 }
+      { top: numberElements }
     );
 
     res.status(200).json({ expenses: emails });
@@ -70,7 +70,7 @@ async function getExpensesByUserIdDateRange(req, res, next) {
 }
 
 export {
-  getEmailExpensesRappi,
+  getEmailExpensesFromFolder,
   getExpensesByIdUser,
   getExpensesByUserIdDateRange
 };

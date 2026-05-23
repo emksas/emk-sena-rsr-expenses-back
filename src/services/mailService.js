@@ -107,9 +107,10 @@ export async function getMessagesFromFolderPath(
   const ids = out.map((m) => m.id);
   const bodies = await fetchBodiesByBatch(ids, token);
 
+  console.log("resultado from outlook: ", out);
+
   for (const m of out) {
     m.bodyText = parseFn(bodies.get(m.id) || "");
-    console.log("---------------------------------------");
     if (m.bodyText.amount && m.bodyText.transactionDate) {
       const expenseInformation = {
         amount: m.bodyText.amount,
@@ -122,17 +123,16 @@ export async function getMessagesFromFolderPath(
         userId: userId,
       };
       const expenseAdded = await add(expenseInformation);
-      console.log(`Expense added to database with ID: ${expenseAdded}`);
+      
+      console.log(`Gasto agregado a la base de datos para el mensaje ${m.id}: `, expenseAdded);
 
-      const messageMarked = await markMessageAsRead(m.id, token);
-      console.log(`Marked message ${m.id} as read:`, messageMarked.isRead);
+      
+      //const messageMarked = await markMessageAsRead(m.id, token);
     } else {
       console.warn(
         `Message ${m.id} no tiene datos de gasto válidos, no lo marco como leído.`,
       );
     }
-    console.log(`Parsed message ${m.id}:`, m.bodyText);
-    console.log("---------------------------------------");
   }
 
   return out.slice(0, top);

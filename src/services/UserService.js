@@ -27,9 +27,6 @@ async function getUserById(userId) {
 
   return new Promise((resolve, reject) => {
     const query = "SELECT * FROM public.user_information WHERE user_id = $1;";
-    console.log("Ejecutando consulta para obtener usuario por ID:", userId);
-    console.log("Consulta SQL:", query);
-    console.log("Parámetros de la consulta:", [parseInt(userId)]);
     
     pool.query(query, [parseInt(userId)], (error, results) => {
       if (error) {
