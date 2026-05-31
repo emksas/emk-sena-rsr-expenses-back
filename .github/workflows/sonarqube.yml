@@ -1,47 +1,46 @@
-name: SonarQube analysis
+#name: SonarQube analysis
+#on:
+#  push:
+#    branches: [ "master" ]   # cambia a "master" si tu rama por defecto es master
+#  pull_request:
+#    branches: [ "master" ]   # idem
+#  workflow_dispatch:
 
-on:
-  push:
-    branches: [ "master" ]   # cambia a "master" si tu rama por defecto es master
-  pull_request:
-    branches: [ "master" ]   # idem
-  workflow_dispatch:
+#permissions:
+#  contents: read
+#  pull-requests: write
+#  checks: write
+#  statuses: write
 
-permissions:
-  contents: read
-  pull-requests: write
-  checks: write
-  statuses: write
+#jobs:
+#  Analysis:
+#    runs-on: ubuntu-latest
+#    steps:
+#      - name: Checkout
+#        uses: actions/checkout@v4
+#        with:
+#          fetch-depth: 0          # necesario para que detecte SCM/git correctamente
 
-jobs:
-  Analysis:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0          # necesario para que detecte SCM/git correctamente
+#      - name: Debug paths
+#        run: |
+#          pwd
+#          ls -la
+#          echo "--- carpetas src encontradas ---"
+#          find . -maxdepth 3 -type d -name src -print || true
+#          echo "--- ejemplos de fuentes ---"
+#          find . -maxdepth 4 -type f \( -name "*.ts" -o -name "*.js" -o -name "*.java" -o -name "*.py" \) | head -n 50 || true
 
-      - name: Debug paths
-        run: |
-          pwd
-          ls -la
-          echo "--- carpetas src encontradas ---"
-          find . -maxdepth 3 -type d -name src -print || true
-          echo "--- ejemplos de fuentes ---"
-          find . -maxdepth 4 -type f \( -name "*.ts" -o -name "*.js" -o -name "*.java" -o -name "*.py" \) | head -n 50 || true
-
-      - name: SonarQube Scan
-        uses: SonarSource/sonarqube-scan-action@v2
-        with:
+#      - name: SonarQube Scan
+#        uses: SonarSource/sonarqube-scan-action@v2
+#        with:
           # Si tu código está en la raíz, deja sources=.
           # Si está en otra carpeta, cambia por esa ruta (p.ej. backend o packages/api)
-          args: >
-            -Dsonar.projectKey=emksas_emk-sena-rsr-expenses-back_AZkf2ulMslpodw3j7nbR
-            -Dsonar.projectName=emk-sena-rsr-expenses-back
-            -Dsonar.sources=.
-            -Dsonar.exclusions=**/node_modules/**,**/dist/**,**/build/**,**/coverage/**
-            -Dsonar.scm.provider=git
-        env:
-          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+#          args: >
+#            -Dsonar.projectKey=emksas_emk-sena-rsr-expenses-back_AZkf2ulMslpodw3j7nbR
+#            -Dsonar.projectName=emk-sena-rsr-expenses-back
+#            -Dsonar.sources=.
+#            -Dsonar.exclusions=**/node_modules/**,**/dist/**,**/build/**,**/coverage/**
+#            -Dsonar.scm.provider=git
+#        env:
+#          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+#          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
