@@ -2,14 +2,16 @@ import { encrypt } from "../security/crypto.js";
 import { cca } from "../config/auth.js";
 
 const SCOPES = ["openid", "profile", "Mail.ReadWrite", "offline_access"];
+const MICROSOFT_REDIRECT_URI =
+  process.env.MS_REDIRECT_URI || "http://localhost:3000/api/auth/redirect";
 
-function buildAuthUrl(userId) {
-  
+function buildAuthUrl(userId, returnTo) {
   return cca.getAuthCodeUrl({
     scopes: SCOPES,
-    redirectUri: "http://localhost:3000/api/auth/redirect",
+    redirectUri: MICROSOFT_REDIRECT_URI,
     state: JSON.stringify({
-        userId: userId ?? undefined,
+      userId: userId ?? undefined,
+      returnTo: returnTo ?? undefined,
     }),
   });
 }
@@ -18,7 +20,7 @@ async function handleAuthCode(code) {
   const result = await cca.acquireTokenByCode({
     code,
     scopes: SCOPES,
-    redirectUri: "http://localhost:3000/api/auth/redirect",
+    redirectUri: MICROSOFT_REDIRECT_URI,
   });
 
   const cacheString = cca.getTokenCache().serialize();
