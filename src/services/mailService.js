@@ -92,6 +92,7 @@ export async function getMessagesFromFolderPath(
     $top: Math.min(top, 100),
     $select: "id,subject,from,receivedDateTime,isRead",
     $orderby: "receivedDateTime desc",
+    $filter: "isRead eq false",
   };
 
   let url = `${GRAPH_BASE_URL}/me/mailFolders/${folderId}/messages`;
@@ -123,7 +124,7 @@ export async function getMessagesFromFolderPath(
         userId: userId,
       };
       const expenseAdded = await add(expenseInformation);
-      
+
       console.log(`Gasto agregado a la base de datos para el mensaje ${m.id}: `, expenseAdded);
 
       /*
