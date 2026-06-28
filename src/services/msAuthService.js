@@ -5,10 +5,41 @@ const SCOPES = ["openid", "profile", "Mail.ReadWrite", "offline_access"];
 const MICROSOFT_REDIRECT_URI =
   process.env.MS_REDIRECT_URI || "http://localhost:3000/api/auth/redirect";
 
-function buildAuthUrl(userId, returnTo) {
+function getRequestOrigin(req) {
+  if (!req) {
+    return null;
+  }
+
+  const forwardedProto = req.get("x-forwarded-proto")?.split(",")[0]?.trim();
+  const forwardedHost = req.get("x-forwarded-host")?.split(",")[0]?.trim();
+  const protocol = forwardedProto || req.protocol || "http";
+  const host = forwardedHost || req.get("host");
+
+  if (!host) {
+    return null;
+  }
+
+  return `${protocol}://${host}`;
+}
+
+function buildServerAuthRedirectUrl(req) {
+  const origin = getRequestOrigin(req);
+
+  if (!origin) {
+    return MICROSOFT_REDIRECT_URI;
+  }
+
+  return `${origin}/api/auth/redirect`;
+}
+
+function buildAuthUrl(userId, returnTo, req) {
+  const redirectUri = buildServerAuthRedirectUrl(req);
+
+  console.log("redirectUri construido para Microsoft:", redirectUri);
+
   return cca.getAuthCodeUrl({
     scopes: SCOPES,
-    redirectUri: MICROSOFT_REDIRECT_URI,
+    redirectUri: redirectUri,
     state: JSON.stringify({
       userId: userId ?? undefined,
       returnTo: returnTo ?? undefined,
@@ -16,11 +47,11 @@ function buildAuthUrl(userId, returnTo) {
   });
 }
 
-async function handleAuthCode(code) {
+async function handleAuthCode(code, redirectUri = MICROSOFT_REDIRECT_URI) {
   const result = await cca.acquireTokenByCode({
     code,
     scopes: SCOPES,
-    redirectUri: MICROSOFT_REDIRECT_URI,
+    redirectUri,
   });
 
   const cacheString = cca.getTokenCache().serialize();
@@ -57,6 +88,7 @@ function getUserInformation(req, res, next) {
 
 export {
   buildAuthUrl,
+  buildServerAuthRedirectUrl,
   handleAuthCode,
   getAccessTokenForSession,
   getUserInformation,
