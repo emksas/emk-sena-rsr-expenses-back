@@ -1,5 +1,5 @@
 import { add } from "./ExpensesService.js";
-import { GRAPH_BASE_URL, graphGet, graphPost } from "./graphClient.js";
+import { GRAPH_BASE_URL, graphGet, graphPatch, graphPost } from "./graphClient.js";
 
 const esc = (s) => s.replace(/'/g, "''");
 
@@ -92,6 +92,7 @@ export async function getMessagesFromFolderPath(
     $top: Math.min(top, 100),
     $select: "id,subject,from,receivedDateTime,isRead",
     $orderby: "receivedDateTime desc",
+    $filter: "isRead eq false",
   };
 
   let url = `${GRAPH_BASE_URL}/me/mailFolders/${folderId}/messages`;
@@ -123,11 +124,14 @@ export async function getMessagesFromFolderPath(
         userId: userId,
       };
       const expenseAdded = await add(expenseInformation);
-      
+
       console.log(`Gasto agregado a la base de datos para el mensaje ${m.id}: `, expenseAdded);
 
-      
-      //const messageMarked = await markMessageAsRead(m.id, token);
+      /*
+      const messageMarked = await markMessageAsRead(m.id, token);
+      m.isRead = true;
+      console.log(`Mensaje ${m.id} marcado como leído: `, messageMarked);
+      */
     } else {
       console.warn(
         `Message ${m.id} no tiene datos de gasto válidos, no lo marco como leído.`,

@@ -1,5 +1,4 @@
 import crypto from "crypto";
-console.log("KEY RAW:", process.env.MSAL_CACHE_ENC_KEY);
 
 // 32 bytes en hex = 64 chars
 const keyHex = process.env.MSAL_CACHE_ENC_KEY;
